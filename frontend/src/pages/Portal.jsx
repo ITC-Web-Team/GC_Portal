@@ -80,7 +80,7 @@ const HTML = `<div class="progress" id="progress"></div>
 
 <main>
   <section id="leaderboard">
-    <h2 class="reveal">Leaderboard 24-25</h2>
+    <h2 class="reveal">Leaderboard 26-27</h2>
     <div class="tabs reveal" id="tabs" role="tablist">
       <span class="ink" id="ink"></span>
       <button data-g="overall" role="tab"><i data-ico="trophy"></i>Overall</button>
