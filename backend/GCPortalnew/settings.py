@@ -18,25 +18,29 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-8rfr0s5v!%4an&suwpm4=%x8g=&0!u2-d&qp3&lu#yub@$+_ic'
+def env_list(name, default):
+    return [v.strip() for v in os.environ.get(name, default).split(',') if v.strip()]
+
+
+SECRET_KEY = os.environ.get(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-8rfr0s5v!%4an&suwpm4=%x8g=&0!u2-d&qp3&lu#yub@$+_ic',
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True  # Make sure debug is off in production
+DEBUG = os.environ.get('DJANGO_DEBUG', 'False').lower() in ('1', 'true', 'yes')
 
-# ALLOWED_HOSTS = [
-#     'gcbackend.tech-iitb.org',
-#     'gc.tech-iitb.org',
-#     'localhost',
-#     '127.0.0.1',
-# ]
+ALLOWED_HOSTS = env_list('DJANGO_ALLOWED_HOSTS', 'gcbackend.tech-iitb.org,localhost,127.0.0.1')
 
-# CSRF_TRUSTED_ORIGINS = [
-#     'https://gcbackend.tech-iitb.org',
-#     'https://gc.tech-iitb.org',
-#     'http://localhost:8000',
-# ]
+CSRF_TRUSTED_ORIGINS = env_list(
+    'CSRF_TRUSTED_ORIGINS',
+    'https://gcbackend.tech-iitb.org,https://gc.tech-iitb.org,http://localhost:8000',
+)
 
-# CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOWED_ORIGINS = env_list('CORS_ALLOWED_ORIGINS', 'https://gc.tech-iitb.org,http://localhost:3000')
+
+# Coolify's proxy terminates HTTPS and forwards plain HTTP
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 
@@ -97,7 +101,7 @@ WSGI_APPLICATION = 'GCPortalnew.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': str(BASE_DIR / "db.sqlite3"),
+        'NAME': os.environ.get('SQLITE_PATH', str(BASE_DIR / "db.sqlite3")),
     }
 }
 
@@ -138,12 +142,9 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'staticfiles')
-]
 
 # Media files
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_ROOT = os.environ.get('MEDIA_ROOT', os.path.join(BASE_DIR, "media"))
 MEDIA_URL = '/media/'
 
 # Default primary key field type
