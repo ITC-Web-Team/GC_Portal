@@ -1,19 +1,14 @@
 /* eslint-disable */
 import React, { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import "./portal.css";
 import logo from "../assets/logo.webp";
 import trophy from "../assets/trophy.png";
+import { get } from "../api";
 
-/* ====== CONFIG: paste your API token (or set REACT_APP_GC_TOKEN in .env) ====== */
-const API = "https://gcbackend.tech-iitb.org";
-const TOKEN = process.env.REACT_APP_GC_TOKEN || "3af5accdebeb5b899e6f9197b0b822f657af008f";
 /* Where clicking a GC card goes. Matches your existing route /GC/Genre1/:id */
 const gcUrl = (id) => `/GC/Genre1/${id}`;
-/* ================================================================================ */
 
-const get = (path) =>
-  fetch(API + path, { headers: { "Content-Type": "application/json", Authorization: "Token " + TOKEN } })
-    .then((r) => { if (!r.ok) throw new Error(path + " " + r.status); return r.json(); });
 const safe = (path) => get(path).catch((e) => { console.error(e); return []; });
 
 const GENRES = [
@@ -80,7 +75,7 @@ const HTML = `<div class="progress" id="progress"></div>
 
 <main>
   <section id="leaderboard">
-    <h2 class="reveal">Leaderboard 26-27</h2>
+    <h2 class="reveal">Leaderboard 26&#8209;27</h2>
     <div class="tabs reveal" id="tabs" role="tablist">
       <span class="ink" id="ink"></span>
       <button data-g="overall" role="tab"><i data-ico="trophy"></i>Overall</button>
@@ -134,12 +129,13 @@ const HTML = `<div class="progress" id="progress"></div>
 
 export default function Portal() {
   const root = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     let dead = false;
     const cleanups = [];
     const __on = (t, f, o) => { window.addEventListener(t, f, o); cleanups.push(() => window.removeEventListener(t, f, o)); };
-    const __openGC = (id) => window.location.assign(gcUrl(id));
+    const __openGC = (id) => navigate(gcUrl(id));
 
     (async () => {
       let data;
@@ -205,8 +201,10 @@ function countUp(el, to, dur=1200){
 }
 
 /* ---------- hero title ---------- */
-$('#title').innerHTML = [...'TECHNICAL GC PORTAL'].map((c, i) =>
-  c === ' ' ? ' ' : `<span style="animation-delay:${.15 + i * .045}s">${c}</span>`).join('');
+/* letters are grouped per word so narrow screens wrap between words, never mid-word */
+let li = 0;
+$('#title').innerHTML = 'TECHNICAL GC PORTAL'.split(' ').map(w =>
+  `<span class="word">${[...w].map(c => `<span style="animation-delay:${.15 + li++ * .045}s">${c}</span>`).join('')}</span>`).join(' ');
 
 /* ---------- starfield ---------- */
 (function(){
@@ -432,6 +430,9 @@ __on('pointermove', e => { glow.style.opacity = 1; glow.style.transform = `trans
 __on('resize', () => { const g = current; current = null; showGenre(g); });
 showGenre('overall');
 onScroll();
+/* content is injected after load, so jump to /#section links (e.g. back from a GC page) by hand */
+const target = location.hash && document.getElementById(location.hash.slice(1));
+if (target) setTimeout(() => target.scrollIntoView(), 60);
 document.fonts && document.fonts.ready.then(() => { const g = current; current = null; showGenre(g); });
     })();
 

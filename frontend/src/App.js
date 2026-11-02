@@ -39,6 +39,7 @@ function App() {
           <Routes>
             {/* New design: has its own navbar + footer, so no Layout */}
             <Route path="/" element={<Portal />} />
+            <Route path="/GC/:genre/:name" element={<Gc />} />
 
             {/* Old pages are now inside Portal, so send old links to it */}
             <Route path="/Overall" element={<Navigate to="/" replace />} />
@@ -54,10 +55,6 @@ function App() {
 
             {/* Pages that keep the old header + sidebar + footer */}
             <Route element={<Layout />}>
-              <Route path="/GC/Genre1/:name" element={<Gc />} />
-              <Route path="/GC/Genre2/:name" element={<Gc />} />
-              <Route path="/GC/Genre3/:name" element={<Gc />} />
-              <Route path="/GC/Genre4/:name" element={<Gc />} />
               <Route path="/instuctions" element={<Instuctions />} />
               <Route path="/Dashboard/:name" element={<Dashboard />} />
             </Route>

@@ -34,7 +34,8 @@ const Loader = () => {
   };
 
   useEffect(() => {
-    rotateAndScaleAnimation();
+    // StrictMode remounts in dev, which makes framer-motion reject start() on the unmounted pass
+    rotateAndScaleAnimation().catch(() => {});
   }, []);
 
   return (
